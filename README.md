@@ -3,14 +3,17 @@
 A single wall-mounted-tablet dashboard combining three independent, already-working
 standalone apps into one page:
 
-- **Left column**: [DHMZ standalone](../DHMZ%20standalone) — weather forecast + radar
-- **Right column, top**: [Eko Karta Zagreb - standalone](../Eko%20Karta%20Zagreb%20-%20standalone) — current air-quality/weather sensor readings
-- **Right column, bottom**: [Stampar Pelud - standalone](../Stampar%20Pelud%20-%20standalone) — pollen forecast
+- **Left column**: [dhmz-weather-dashboard](../dhmz-weather-dashboard) — weather forecast + radar
+- **Right column, top**: [eko-karta-zagreb-standalone](../eko-karta-zagreb-standalone) — current air-quality/weather sensor readings
+- **Right column, bottom**: [stampar-pelud-standalone](../stampar-pelud-standalone) — pollen forecast
 
 This repo does not duplicate any of the three apps' code. It's glue only:
 a merged frontend (`dashboard/frontend/`) and an nginx reverse proxy, orchestrated by
 one `docker-compose.yml` that builds the three backends straight from their own sibling
-repos (must be checked out next to this one, exactly as they are on this machine).
+repos, checked out next to this one **using their default `git clone` folder names**
+(i.e. matching the GitHub repo name — the build contexts in `docker-compose.yml` rely
+on that, so a fresh `git clone` of all four repos "just works" without renaming
+anything).
 
 ## Architecture
 
@@ -32,13 +35,21 @@ host; the backends are reachable only from other containers on the compose netwo
 
 ## Running it
 
-Requires the three sibling repos to be checked out next to this one:
+Clone all four repos as siblings, using their default (repo-name) folder names —
+don't rename them, `docker-compose.yml`'s build contexts depend on this:
+
+```bash
+git clone https://github.com/kpisacic/dhmz-weather-dashboard.git
+git clone https://github.com/kpisacic/eko-karta-zagreb-standalone.git
+git clone https://github.com/kpisacic/stampar-pelud-standalone.git
+git clone <this-repo-url> my-unified-dashboard
+```
 
 ```
-C:\Lang\DHMZ standalone\
-C:\Lang\Eko Karta Zagreb - standalone\
-C:\Lang\Stampar Pelud - standalone\
-C:\Lang\my-unified-dashboard\        <- this repo
+dhmz-weather-dashboard/
+eko-karta-zagreb-standalone/
+stampar-pelud-standalone/
+my-unified-dashboard/        <- this repo; run the command below from here
 ```
 
 ```bash
@@ -86,9 +97,9 @@ dashboard/
   frontend/
     index.html          # 2-column grid: panel-dhmz | (panel-eko above panel-pollen)
     style.css           # shared reset, dark theme vars, page-level grid
-    dhmz.css / dhmz.js   # ported from DHMZ standalone/frontend, namespaced under .panel-dhmz
-    eko.css  / eko.js    # ported from Eko Karta .../static, namespaced under .panel-eko
-    pollen.css / pollen.js # ported from Stampar .../static, namespaced under .panel-pollen
+    dhmz.css / dhmz.js   # ported from dhmz-weather-dashboard/frontend, namespaced under .panel-dhmz
+    eko.css  / eko.js    # ported from eko-karta-zagreb-standalone/.../static, namespaced under .panel-eko
+    pollen.css / pollen.js # ported from stampar-pelud-standalone/.../static, namespaced under .panel-pollen
     icons/               # copy of Stampar's pollen plant icon set
 data/
   dhmz/                  # bind-mounted persisted state for the DHMZ backend (gitignored)

@@ -1,7 +1,7 @@
 services:
   dhmz-weather:
     build:
-      context: "../DHMZ standalone"
+      context: "../dhmz-weather-dashboard"
       dockerfile: backend/Dockerfile
     container_name: dhmz-weather
     environment:
@@ -22,7 +22,7 @@ services:
 
   eko-karta-zagreb:
     build:
-      context: "../Eko Karta Zagreb - standalone"
+      context: "../eko-karta-zagreb-standalone"
     container_name: eko-karta-zagreb
     environment:
       DEFAULT_STATION_ID: "969"
@@ -33,7 +33,7 @@ services:
 
   stampar-pelud:
     build:
-      context: "../Stampar Pelud - standalone"
+      context: "../stampar-pelud-standalone"
     container_name: stampar-pelud
     environment:
       STAMPAR_STATION_ID: "26"
