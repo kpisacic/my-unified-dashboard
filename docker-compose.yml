@@ -1,0 +1,55 @@
+services:
+  dhmz-weather:
+    build:
+      context: "../DHMZ standalone"
+      dockerfile: backend/Dockerfile
+    container_name: dhmz-weather
+    environment:
+      DHMZ_STATION_NAME: "Zagreb-Maksimir"
+      DHMZ_FORECAST_REGION_NAME: "Zagreb"
+      DHMZ_FORECAST_TEXT: "zg_text"
+      DHMZ_FORECAST_STATION_NAME: "ZAGREB-MAKSIMIR"
+      DHMZ_TIMEZONE: "Europe/Zagreb"
+      DHMZ_WEATHER_CACHE_SECONDS: "1800"
+      DHMZ_RADAR_CACHE_SECONDS: "600"
+      DHMZ_MARK_LOCATION: "false"
+      DHMZ_RADAR_FORMAT: "GIF"
+    volumes:
+      - ./data/dhmz:/data
+    restart: unless-stopped
+    # No host port published - only the dashboard (nginx) talks to this,
+    # over the internal compose network.
+
+  eko-karta-zagreb:
+    build:
+      context: "../Eko Karta Zagreb - standalone"
+    container_name: eko-karta-zagreb
+    environment:
+      DEFAULT_STATION_ID: "969"
+      REFRESH_INTERVAL_SECONDS: "300"
+      DATA_CACHE_TTL_SECONDS: "300"
+    mem_limit: 64m
+    restart: unless-stopped
+
+  stampar-pelud:
+    build:
+      context: "../Stampar Pelud - standalone"
+    container_name: stampar-pelud
+    environment:
+      STAMPAR_STATION_ID: "26"
+      REFRESH_INTERVAL_SECONDS: "1800"
+      ICON_STYLE: "pictogram"
+      ACTIVE_ONLY: "true"
+    mem_limit: 128m
+    restart: unless-stopped
+
+  dashboard:
+    build: ./dashboard
+    container_name: wall-dashboard
+    ports:
+      - "8090:80"
+    depends_on:
+      - dhmz-weather
+      - eko-karta-zagreb
+      - stampar-pelud
+    restart: unless-stopped

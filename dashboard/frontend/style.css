@@ -1,0 +1,64 @@
+/* Shared reset + page-level grid. Fixed dark theme across all three panels -
+   this runs as a dedicated wall-tablet kiosk display, not a general browser
+   page, so it doesn't follow the device's OS light/dark setting. */
+:root {
+  --bg: #101215;
+  --panel-bg: #1c1f24;
+  --text: #eef0f3;
+  --muted: #9aa1ac;
+  --divider: rgba(255, 255, 255, 0.12);
+  --border: #2c3237;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 14px;
+  height: 100vh;
+  padding: 14px;
+}
+
+.right-col {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  min-height: 0;
+}
+
+.panel {
+  background: var(--panel-bg);
+  border-radius: 16px;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Narrower / portrait screens: stack everything in one column instead of
+   the 2-column wall-tablet layout. */
+@media (max-width: 860px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+  html, body { overflow: auto; }
+  .right-col {
+    grid-template-rows: auto auto;
+  }
+  .panel { overflow: visible; }
+}

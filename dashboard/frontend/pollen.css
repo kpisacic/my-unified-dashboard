@@ -1,0 +1,215 @@
+/* Pollen forecast panel. Ported from
+   Stampar Pelud - standalone/static/style.css: every rule scoped under
+   .panel-pollen so it can't leak into the other two panels. Pinned to the
+   dark palette (the original also supports light mode via
+   prefers-color-scheme, but this runs as a fixed-theme kiosk display like
+   the other two panels). */
+
+.panel-pollen {
+  --card-bg: #1f2228;
+  --card-border: #2c3038;
+  --accent: #2563eb;
+
+  --c-unknown: #9a9a9a;
+  --c-nemapeludi: #2b2b2b;
+  --c-niska: #4caf50;
+  --c-umjerena: #e08e00;
+  --c-visoka: #f44336;
+  --c-vrlovisoka: #ff4569;
+  --icon-invert: 1;
+
+  padding: 12px 16px 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-pollen .topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.panel-pollen .topbar-title h1 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.panel-pollen .subtitle {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 2px;
+}
+
+.panel-pollen .controlsbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding: 10px 0 0;
+  margin-top: 10px;
+  border-top: 1px solid var(--card-border);
+}
+
+.panel-pollen .controlsbar label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.panel-pollen .checkbox-label {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 6px !important;
+}
+
+.panel-pollen select,
+.panel-pollen button {
+  font: inherit;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text);
+}
+
+.panel-pollen button#pollen-refresh-btn {
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 5px 9px;
+}
+
+.panel-pollen main#pollen-app {
+  padding: 10px 0 4px;
+  overflow: auto;
+  min-height: 0;
+}
+
+.panel-pollen .status {
+  color: var(--muted);
+  font-size: 0.85rem;
+  min-height: 1.2em;
+  margin-bottom: 8px;
+}
+
+.panel-pollen .status.error {
+  color: var(--c-visoka);
+}
+
+.panel-pollen .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 10px;
+}
+
+.panel-pollen .card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 8px 6px 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.panel-pollen .card-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  min-height: 2.1em;
+  display: flex;
+  align-items: center;
+}
+
+.panel-pollen .card-icon {
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel-pollen .card-icon img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.panel-pollen .card-value {
+  font-size: 1.02rem;
+  font-weight: 700;
+  min-height: 1.2em;
+}
+
+.panel-pollen .card-level {
+  font-size: 0.75rem;
+  min-height: 1em;
+}
+
+.panel-pollen .card-forecast {
+  font-size: 0.7rem;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.panel-pollen .forecast-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.panel-pollen .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* level colors */
+.panel-pollen .level-unknown { color: var(--c-unknown); }
+.panel-pollen .level-nemapeludi { color: var(--c-nemapeludi); }
+.panel-pollen .level-niska { color: var(--c-niska); font-weight: 700; }
+.panel-pollen .level-umjerena { color: var(--c-umjerena); font-weight: 700; }
+.panel-pollen .level-visoka { color: var(--c-visoka); font-weight: 700; }
+.panel-pollen .level-vrlovisoka, .panel-pollen .level-jakovisoka {
+  color: var(--c-vrlovisoka);
+  font-weight: 700;
+  text-decoration: overline;
+}
+
+.panel-pollen .dot.level-unknown { background: var(--c-unknown); }
+.panel-pollen .dot.level-nemapeludi { background: var(--c-nemapeludi); }
+.panel-pollen .dot.level-niska { background: var(--c-niska); }
+.panel-pollen .dot.level-umjerena { background: var(--c-umjerena); }
+.panel-pollen .dot.level-visoka { background: var(--c-visoka); }
+.panel-pollen .dot.level-vrlovisoka, .panel-pollen .dot.level-jakovisoka { background: var(--c-vrlovisoka); }
+
+.panel-pollen .icon-filter-unknown {
+  filter: invert(var(--icon-invert)) grayscale(100%) contrast(60%) opacity(60%);
+}
+.panel-pollen .icon-filter-nemapeludi {
+  filter: invert(var(--icon-invert)) grayscale(100%) contrast(90%);
+}
+.panel-pollen .icon-filter-niska {
+  filter: invert(29%) sepia(54%) saturate(724%) hue-rotate(78deg) brightness(94%) contrast(93%);
+}
+.panel-pollen .icon-filter-umjerena {
+  filter: invert(56%) sepia(78%) saturate(1450%) hue-rotate(0deg) brightness(101%) contrast(101%);
+}
+.panel-pollen .icon-filter-visoka {
+  filter: invert(23%) sepia(89%) saturate(4198%) hue-rotate(349deg) brightness(87%) contrast(93%);
+}
+.panel-pollen .icon-filter-vrlovisoka, .panel-pollen .icon-filter-jakovisoka {
+  filter: invert(9%) sepia(51%) saturate(5295%) hue-rotate(1deg) brightness(75%) contrast(120%);
+}

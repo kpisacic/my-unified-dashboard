@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Wall Dashboard</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="dhmz.css">
+<link rel="stylesheet" href="eko.css">
+<link rel="stylesheet" href="pollen.css">
+</head>
+<body>
+  <!-- DHMZ weather condition icons (referenced by dhmz.js via <use>) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="dhmz-icon-humidity" viewBox="0 0 24 24"><path d="M12 2s6 7.2 6 11.5A6 6 0 0 1 6 13.5C6 9.2 12 2 12 2z"/></symbol>
+      <symbol id="dhmz-icon-rain" viewBox="0 0 24 24"><path d="M6 14v3M10 14v3M14 14v3M18 14v3M7 10a4 4 0 0 1 .5-7.9A5 5 0 0 1 17 4a3.5 3.5 0 0 1-.6 6.9H7z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+      <symbol id="dhmz-icon-gauge" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9M12 3v3M3 12h3M18.5 5.5l-2.1 2.1M12 12l4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+      <symbol id="dhmz-icon-sunrise" viewBox="0 0 24 24"><path d="M12 17V9m-3.5 4.5L12 9l3.5 4.5M3 20h18M5 17a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="dhmz-icon-wind" viewBox="0 0 24 24"><path d="M3 8h11a2.5 2.5 0 1 0-2.5-2.5M3 12h15a2.5 2.5 0 1 1-2.5 2.5M3 16h9a2 2 0 1 1-2 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+      <symbol id="dhmz-icon-arrow" viewBox="0 0 24 24"><path d="M12 3v18M12 3l-5 5M12 3l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    </defs>
+  </svg>
+
+  <div class="dashboard-grid">
+
+    <section class="panel panel-dhmz">
+      <div class="col col-main">
+        <header class="header">
+          <h1 id="dhmz-station-name">&nbsp;</h1>
+          <span id="dhmz-updated" class="updated"></span>
+        </header>
+
+        <section class="main">
+          <img id="dhmz-condition-icon" class="condition-icon" alt="">
+          <div class="temp-block">
+            <div class="temp"><span id="dhmz-temperature">--</span><sup>&deg;C</sup></div>
+            <div id="dhmz-condition-text" class="condition-text"></div>
+          </div>
+        </section>
+
+        <section class="attributes">
+          <div class="attr">
+            <div class="attr-line"><svg class="mi"><use href="#dhmz-icon-humidity"/></svg><span id="dhmz-humidity">--</span>&nbsp;%</div>
+            <div class="attr-line"><svg class="mi"><use href="#dhmz-icon-rain"/></svg><span id="dhmz-precipitation">--</span>&nbsp;mm</div>
+          </div>
+          <div class="attr">
+            <div class="attr-line"><svg class="mi"><use href="#dhmz-icon-gauge"/></svg><span id="dhmz-pressure">--</span>&nbsp;hPa <span id="dhmz-pressure-tendency" class="muted"></span></div>
+            <div class="attr-line attr-sun" id="dhmz-sun-row" hidden><svg class="mi"><use href="#dhmz-icon-sunrise"/></svg><span id="dhmz-sunrise">--:--</span>&nbsp;&ndash;&nbsp;<span id="dhmz-sunset">--:--</span></div>
+          </div>
+          <div class="attr">
+            <div class="attr-line"><svg class="mi wind-arrow" id="dhmz-wind-arrow"><use href="#dhmz-icon-arrow"/></svg><span id="dhmz-wind-bearing">--</span></div>
+            <div class="attr-line"><svg class="mi"><use href="#dhmz-icon-wind"/></svg><span id="dhmz-wind-speed">--</span>&nbsp;m/s</div>
+          </div>
+        </section>
+
+        <section class="forecast-text" id="dhmz-today-block">
+          <div class="label">Danas</div>
+          <div class="text" id="dhmz-forecast-today"></div>
+        </section>
+
+        <section class="chart-container">
+          <canvas id="dhmz-weather-chart"></canvas>
+        </section>
+
+        <section class="forecast-strip" id="dhmz-forecast-strip"></section>
+
+        <section class="forecast-text" id="dhmz-tomorrow-block">
+          <div class="label">Sutra</div>
+          <div class="text" id="dhmz-forecast-tomorrow"></div>
+        </section>
+
+        <footer class="footer">
+          <span>DHMZ</span>
+          <span id="dhmz-status" class="status"></span>
+        </footer>
+      </div>
+
+      <div class="col col-radar">
+        <h2>Radar</h2>
+        <img id="dhmz-radar-image" class="radar-image" alt="DHMZ radar composite">
+      </div>
+    </section>
+
+    <div class="right-col">
+
+      <section class="panel panel-eko">
+        <header class="app-header">
+          <div class="title-row">
+            <h1>Eko Karta Zagreb</h1>
+            <button id="eko-refresh-btn" class="icon-btn" title="Refresh now" aria-label="Refresh now"></button>
+          </div>
+          <div id="eko-status-line" class="status-line" aria-live="polite">Loading&hellip;</div>
+        </header>
+
+        <div id="eko-error-banner" class="error-banner" hidden></div>
+
+        <main id="eko-metrics" class="metrics-grid" aria-live="polite"></main>
+
+        <div class="controls-row">
+          <label class="station-picker">
+            <span class="station-picker-label">Station</span>
+            <select id="eko-station-select" aria-label="Select station"></select>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel panel-pollen">
+        <header class="topbar">
+          <div class="topbar-title">
+            <h1 id="pollen-title">Peludna prognoza</h1>
+            <div class="subtitle" id="pollen-subtitle">&nbsp;</div>
+          </div>
+        </header>
+
+        <main id="pollen-app">
+          <div class="status" id="pollen-status">U&#269;itavanje...</div>
+          <div class="grid" id="pollen-grid"></div>
+        </main>
+
+        <footer class="controlsbar">
+          <label>
+            Postaja
+            <select id="pollen-station-select"></select>
+          </label>
+          <label>
+            Ikone
+            <select id="pollen-icon-style">
+              <option value="pictogram">piktogram</option>
+              <option value="set1">u boji</option>
+              <option value="set2">u boji (prozirno)</option>
+            </select>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" id="pollen-active-only">
+            samo aktivni
+          </label>
+          <button id="pollen-refresh-btn" title="Osvje&#382;i">&#8635;</button>
+        </footer>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="dhmz.js"></script>
+  <script src="eko.js"></script>
+  <script src="pollen.js"></script>
+</body>
+</html>
