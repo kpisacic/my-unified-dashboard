@@ -67,6 +67,16 @@
     el.textContent = value === null || value === undefined || value === "" ? "" : value;
   }
 
+  function localIconUrl(symbol) {
+    // Same-origin, proxied+cached by the DHMZ backend (see /api/icon/<symbol>
+    // in its main.py, reached here through nginx's /api/dhmz/ prefix)
+    // instead of pointing straight at meteo.hr - some Android kiosk
+    // browsers/WebViews whitelist only their own configured origin and
+    // silently block third-party image requests.
+    if (!symbol || symbol === "-") return null;
+    return `/api/dhmz/icon/${encodeURIComponent(symbol)}`;
+  }
+
   function render(data) {
     setText(els.stationName, data.station || data.station_name || "DHMZ");
     const updatedDate = parseDhmzTimestamp(data.updated);
@@ -76,8 +86,9 @@
       });
     }
 
-    if (data.icon_url) {
-      els.conditionIcon.src = data.icon_url;
+    const conditionIconSrc = localIconUrl(data.weather_symbol);
+    if (conditionIconSrc) {
+      els.conditionIcon.src = conditionIconSrc;
       els.conditionIcon.style.visibility = "visible";
     } else {
       els.conditionIcon.style.visibility = "hidden";
@@ -132,7 +143,7 @@
       const item = document.createElement("div");
       item.className = "fc-item";
       const img = document.createElement("img");
-      img.src = entry.icon_url || "";
+      img.src = localIconUrl(entry.weather_symbol) || "";
       // Day/time is already on the chart above; a label here (the day-
       // name/date) was just repeating that same information.
       img.alt = new Date(entry.datetime).toLocaleTimeString(LOCALE, {
