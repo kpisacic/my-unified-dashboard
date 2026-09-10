@@ -46,9 +46,22 @@ html, body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Narrower / portrait screens: stack everything in one column instead of
-   the 2-column wall-tablet layout. */
+/* Compact tablets (e.g. an 8" tablet at ~768px wide in portrait): still
+   2 columns, just tighter gaps/padding - see dhmz.css/eko.css/pollen.css
+   for the matching per-panel padding/type-size reductions at this
+   breakpoint that make the narrower columns actually fit their content. */
 @media (max-width: 860px) {
+  .dashboard-grid {
+    grid-template-columns: 1.12fr 1fr;
+    gap: 8px;
+    padding: 8px;
+  }
+  .right-col { gap: 8px; }
+}
+
+/* True single-column fallback for genuinely narrow screens (phones) -
+   below this, even the compact 2-column spacing above has no room left. */
+@media (max-width: 480px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;

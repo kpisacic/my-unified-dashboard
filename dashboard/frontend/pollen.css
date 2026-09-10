@@ -213,3 +213,16 @@
 .panel-pollen .icon-filter-vrlovisoka, .panel-pollen .icon-filter-jakovisoka {
   filter: invert(9%) sepia(51%) saturate(5295%) hue-rotate(1deg) brightness(75%) contrast(120%);
 }
+
+/* Compact 2-column tablet width (see style.css) - column is ~340-360px,
+   the card grid's own auto-fill(minmax(104px,1fr)) already drops to 2
+   cards per row on its own; just trim padding/type (~1pt) to de-cramp it. */
+@media (max-width: 860px) {
+  .panel-pollen { padding: 8px 12px 10px; }
+  .panel-pollen .topbar { padding-bottom: 8px; }
+  .panel-pollen .topbar-title h1 { font-size: 1.1rem; }
+  .panel-pollen .grid { gap: 8px; }
+  .panel-pollen .card { padding: 6px 5px 5px; }
+  .panel-pollen .card-icon { width: 40px; height: 40px; }
+  .panel-pollen .controlsbar { gap: 8px; padding: 8px 0 0; margin-top: 8px; }
+}

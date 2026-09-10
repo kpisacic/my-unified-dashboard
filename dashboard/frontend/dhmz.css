@@ -196,3 +196,42 @@
   background: var(--bg);
   min-height: 160px;
 }
+
+/* Compact 2-column tablet width (see style.css) - the column here is only
+   ~350-390px wide, so type shrinks a bit (~1pt) and the forecast strip,
+   which otherwise has ~14 icon+label items in a single non-wrapping row,
+   drops to every other point (24h instead of 12h spacing) since no amount
+   of font shrinking makes 14 items plus their icons fit in that width. */
+@media (max-width: 860px) {
+  .panel-dhmz {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .panel-dhmz .header h1 { font-size: 20px; }
+  .panel-dhmz .updated, .panel-dhmz .muted { font-size: 12px; }
+
+  .panel-dhmz .main { gap: 14px; margin: 8px 0 14px 0; }
+  .panel-dhmz .condition-icon { width: 64px; height: 64px; }
+  .panel-dhmz .temp { font-size: 46px; }
+  .panel-dhmz .temp sup { font-size: 22px; }
+  .panel-dhmz .condition-text { font-size: 17px; }
+
+  .panel-dhmz .attributes { gap: 6px; margin: 8px 0 14px 0; padding: 10px 0; }
+  .panel-dhmz .attr { font-size: 13px; gap: 4px; }
+  .panel-dhmz .mi { width: 15px; height: 15px; }
+
+  .panel-dhmz .forecast-text { margin: 10px 0; }
+  .panel-dhmz .forecast-text .label { font-size: 12px; }
+  .panel-dhmz .forecast-text .text { font-size: 14px; line-height: 1.4; }
+
+  .panel-dhmz .chart-container { height: 150px; margin: 10px 0; }
+
+  .panel-dhmz .forecast-strip .fc-item { font-size: 10px; }
+  .panel-dhmz .forecast-strip .fc-item:nth-child(2n) { display: none; }
+  .panel-dhmz .forecast-strip img { width: 24px; height: 24px; }
+
+  .panel-dhmz .footer { font-size: 12px; margin-top: 10px; }
+
+  .panel-dhmz .col-radar h2 { font-size: 16px; margin: 0 0 8px 0; }
+}

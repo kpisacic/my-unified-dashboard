@@ -195,6 +195,20 @@
   background: var(--idx-color, var(--text-muted));
 }
 
+/* Compact 2-column tablet width (see style.css) - column is ~340-360px,
+   metrics-grid's own auto-fill(minmax(120px,1fr)) already drops to 2 tiles
+   per row on its own; just trim padding/type (~1pt) so it isn't cramped. */
+@media (max-width: 860px) {
+  .panel-eko { padding: 10px 12px 12px; }
+  .panel-eko .app-header { gap: 8px; margin-bottom: 10px; }
+  .panel-eko .title-row h1 { font-size: 1.15rem; }
+  .panel-eko .status-line { font-size: 0.78rem; }
+  .panel-eko .metrics-grid { gap: 8px; }
+  .panel-eko .metric { padding: 10px 10px 8px; gap: 4px; }
+  .panel-eko .metric-value { font-size: 1.2rem; }
+  .panel-eko .controls-row { margin-top: 10px; padding-top: 10px; }
+}
+
 @media (max-width: 420px) {
   .panel-eko .station-picker { width: 100%; min-width: 0; box-sizing: border-box; }
   .panel-eko #eko-station-select { min-width: 0; flex: 1 1 0%; }
