@@ -73,19 +73,27 @@ above only set what's shown before that choice is made.
 
 Measured with `docker stats` after a real fetch on each (Sept 2026):
 
-| Container | RSS |
-|---|---|
-| dhmz-weather (FastAPI + uvicorn + lxml + Pillow) | ~50 MiB |
-| eko-karta-zagreb (stdlib only) | ~16-18 MiB |
-| stampar-pelud (stdlib + bs4) | ~19-21 MiB |
-| wall-dashboard (nginx) | ~8 MiB |
-| **Total** | **~92-97 MiB** |
+| Container | RSS | Idle CPU |
+|---|---|---|
+| dhmz-weather (stdlib http.server + lxml + Pillow) | ~31-33 MiB | ~0.02% |
+| eko-karta-zagreb (stdlib only) | ~16-21 MiB | ~0.02-0.03% |
+| stampar-pelud (stdlib + bs4) | ~19-25 MiB | ~0.02% |
+| wall-dashboard (nginx) | ~8 MiB | ~0% |
+| **Total** | **~75-87 MiB** | |
 
-Merging the three backends into one process would only save the duplicated
+All three backends are now plain stdlib `http.server` apps (no web framework) — see
+[dhmz-weather-dashboard](../dhmz-weather-dashboard)'s history: it originally ran on
+FastAPI/uvicorn (~50 MiB RSS, plus a constant ~0.3% idle CPU draw from uvicorn's
+background tick loop), which turned out to add real memory/CPU weight without the app
+ever using any of FastAPI's async/validation/DI features — every handler was already
+plain synchronous code. Porting it to the same stdlib pattern as the other two dropped
+it to ~31 MiB and near-zero idle CPU, with no functional loss.
+
+Merging the three backends into one process would still only save the duplicated
 Python-interpreter baseline (roughly 20-30 MiB) — a small slice of a 1 GB Raspberry Pi
-3B+'s budget — at the cost of losing independent operation/failure isolation and mixing
-an async FastAPI app with two synchronous stdlib threaded servers in one codebase. Not
-worth it; the current ~95 MiB total leaves plenty of headroom.
+3B+'s budget — at the cost of losing independent operation/failure isolation. With all
+three already lightweight stdlib servers, that tradeoff is even less worth it now than
+before; not worth it. The current ~75-87 MiB total leaves plenty of headroom.
 
 ## Project layout
 
