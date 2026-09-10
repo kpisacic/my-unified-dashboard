@@ -24,7 +24,7 @@ html, body {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 1.15fr 1fr;
+  grid-template-columns: 1.25fr 1fr;
   gap: 14px;
   height: 100vh;
   padding: 14px;
@@ -52,7 +52,7 @@ html, body {
    breakpoint that make the narrower columns actually fit their content. */
 @media (max-width: 860px) {
   .dashboard-grid {
-    grid-template-columns: 1.12fr 1fr;
+    grid-template-columns: 1.25fr 1fr;
     gap: 8px;
     padding: 8px;
   }

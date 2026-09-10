@@ -130,6 +130,10 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 10px;
+  /* Without this, grid rows default to "stretch": a card whose value
+     wraps to 2 lines (see .has-index) would force every other card in
+     that same row to grow to match it, even ones with nothing to wrap. */
+  align-items: start;
 }
 
 .panel-eko .metric {
@@ -137,12 +141,12 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 5px;
+  gap: 4px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-left: 4px solid var(--metric-color, var(--border));
   border-radius: 14px;
-  padding: 12px 12px 10px;
+  padding: 10px 10px 8px;
   text-align: left;
   color: var(--text);
   cursor: default;
@@ -153,9 +157,20 @@
 .panel-eko .metric.is-clickable { cursor: pointer; }
 .panel-eko .metric.is-clickable:hover { background: var(--surface-hover); }
 
+/* Icon + value/unit sit side by side on one row instead of icon-then-value
+   stacked on two - saves a full row of card height. */
+.panel-eko .metric-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
 .panel-eko .metric-icon {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
+  flex: none;
   color: var(--metric-color, var(--text-muted));
 }
 .panel-eko .metric-icon svg { width: 100%; height: 100%; }
@@ -164,6 +179,22 @@
   font-size: 1.3rem;
   font-weight: 700;
   line-height: 1.1;
+  /* Never wrap onto a second line - that made just one card taller than
+     its neighbors. Instead this can shrink (min-width:0) below its own
+     content width when a corner index badge leaves no room, and anything
+     that still doesn't fit is simply clipped (overflow:hidden) rather
+     than wrapping or spilling under the badge. */
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Cards with a corner index badge (see .metric-index) reserve room for it
+   so the value+unit's visible, non-clipped portion stops short of the
+   badge instead of running underneath it. Plain cards with no badge
+   (temperature, humidity, pressure...) don't pay for this. */
+.panel-eko .metric.has-index .metric-main {
+  padding-right: 26px;
 }
 
 .panel-eko .metric-value.is-empty {
@@ -179,14 +210,16 @@
 }
 
 .panel-eko .metric-label {
-  font-size: 0.82rem;
+  /* ~2pt smaller than the 0.82rem this used to be. */
+  font-size: 0.65rem;
   color: var(--text-muted);
 }
 
 .panel-eko .metric-index {
+  /* Tucked right into the card's corner (2px) rather than inset 10px. */
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 2px;
+  right: 2px;
   font-size: 0.66rem;
   font-weight: 700;
   padding: 2px 7px;

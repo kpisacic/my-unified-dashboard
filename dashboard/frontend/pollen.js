@@ -75,11 +75,9 @@
 
     const card = document.createElement("div");
     card.className = "card";
-
-    const name = document.createElement("div");
-    name.className = "card-name";
-    name.textContent = plant.name;
-    card.appendChild(name);
+    // Left accent border colored by this plant's own concentration level,
+    // same visual language as the Eko Karta Zagreb metric cards.
+    card.style.setProperty("--level-color", `var(--c-${slug})`);
 
     const iconWrap = document.createElement("div");
     iconWrap.className = "card-icon";
@@ -95,15 +93,29 @@
     }
     card.appendChild(iconWrap);
 
-    const valueEl = document.createElement("div");
+    // Icon on the left; name / value+level / forecast stacked to its right.
+    const main = document.createElement("div");
+    main.className = "card-main";
+
+    const name = document.createElement("div");
+    name.className = "card-name";
+    name.textContent = plant.name;
+    main.appendChild(name);
+
+    const valueRow = document.createElement("div");
+    valueRow.className = "card-value-row";
+
+    const valueEl = document.createElement("span");
     valueEl.className = `card-value level-${slug}`;
     valueEl.textContent = current ? value : "";
-    card.appendChild(valueEl);
+    valueRow.appendChild(valueEl);
 
-    const levelEl = document.createElement("div");
+    const levelEl = document.createElement("span");
     levelEl.className = `card-level level-${slug}`;
     levelEl.textContent = current && current.value ? level : "";
-    card.appendChild(levelEl);
+    valueRow.appendChild(levelEl);
+
+    main.appendChild(valueRow);
 
     const forecastEl = document.createElement("div");
     forecastEl.className = "card-forecast";
@@ -116,7 +128,9 @@
       item.appendChild(document.createTextNode(formatDate(m.date)));
       forecastEl.appendChild(item);
     });
-    card.appendChild(forecastEl);
+    main.appendChild(forecastEl);
+
+    card.appendChild(main);
 
     return { card, known: plant.known };
   }
@@ -141,6 +155,9 @@
   }
 
   function setStatus(text, isError) {
+    // Collapsed entirely when there's nothing to say (the normal, loaded
+    // state) instead of reserving a blank line above the card grid.
+    els.status.hidden = !text;
     els.status.textContent = text;
     els.status.classList.toggle("error", !!isError);
   }

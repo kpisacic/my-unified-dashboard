@@ -133,13 +133,12 @@
       item.className = "fc-item";
       const img = document.createElement("img");
       img.src = entry.icon_url || "";
-      img.alt = entry.condition || "";
-      const label = document.createElement("span");
-      label.textContent = new Date(entry.datetime).toLocaleTimeString(LOCALE, {
+      // Day/time is already on the chart above; a label here (the day-
+      // name/date) was just repeating that same information.
+      img.alt = new Date(entry.datetime).toLocaleTimeString(LOCALE, {
         weekday: "short", hour: "2-digit", hour12: false,
-      });
+      }) + (entry.condition ? ` — ${entry.condition}` : "");
       item.appendChild(img);
-      item.appendChild(label);
       els.forecastStrip.appendChild(item);
     }
   }
@@ -248,6 +247,9 @@
   }
 
   function setStatus(message, isStale) {
+    // Collapsed entirely in the normal (non-stale) case instead of always
+    // reserving a line under "Updated ...".
+    els.status.hidden = !message;
     els.status.textContent = message;
     els.status.classList.toggle("stale", Boolean(isStale));
   }

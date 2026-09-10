@@ -31,6 +31,16 @@
   margin: 0;
 }
 
+/* Holds "Updated ..." plus the (usually empty/collapsed - see .status
+   below) stale-data warning, right-aligned under the station name instead
+   of as a separate footer line under the forecast text. */
+.panel-dhmz .header-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
 .panel-dhmz .updated,
 .panel-dhmz .muted {
   color: var(--muted);
@@ -148,11 +158,7 @@
 
 .panel-dhmz .forecast-strip .fc-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
-  font-size: 12px;
-  color: var(--muted);
 }
 
 .panel-dhmz .forecast-strip img {
@@ -160,10 +166,7 @@
   height: 28px;
 }
 
-.panel-dhmz .footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 16px;
+.panel-dhmz .status {
   font-size: 13px;
   color: var(--muted);
 }
@@ -174,14 +177,6 @@
 
 .panel-dhmz .col-radar {
   text-align: center;
-}
-
-.panel-dhmz .col-radar h2 {
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0 0 12px 0;
-  color: var(--muted);
-  text-align: left;
 }
 
 .panel-dhmz .radar-image {
@@ -227,11 +222,7 @@
 
   .panel-dhmz .chart-container { height: 150px; margin: 10px 0; }
 
-  .panel-dhmz .forecast-strip .fc-item { font-size: 10px; }
-  .panel-dhmz .forecast-strip .fc-item:nth-child(2n) { display: none; }
   .panel-dhmz .forecast-strip img { width: 24px; height: 24px; }
 
-  .panel-dhmz .footer { font-size: 12px; margin-top: 10px; }
-
-  .panel-dhmz .col-radar h2 { font-size: 16px; margin: 0 0 8px 0; }
+  .panel-dhmz .status { font-size: 12px; }
 }

@@ -146,13 +146,20 @@
         const bucket = aqBucket(metric.value);
         indexBadge = `<span class="metric-index" style="--idx-color: var(--aq-${bucket})">${metric.value}</span>`;
       }
+      if (indexBadge) btn.classList.add("has-index");
 
       btn.innerHTML = `
         ${indexBadge}
-        <span class="metric-icon">${resolveIcon(metric.key)}</span>
-        <span class="metric-value ${hasValue ? "" : "is-empty"}">${hasValue ? metric.value : "–"}${
-          hasValue && metric.unit ? `<span class="metric-unit">${metric.unit}</span>` : ""
-        }</span>
+        <span class="metric-main">
+          <span class="metric-icon">${resolveIcon(metric.key)}</span>
+          <span class="metric-value ${hasValue ? "" : "is-empty"}">${hasValue ? metric.value : "–"}${
+            /* non-breaking space: never wrap value from unit - a wrapped
+               row made just that one card taller than its neighbors. If a
+               corner index badge leaves no room, .metric-value just clips
+               (see eko.css) instead. */
+            hasValue && metric.unit ? ` <span class="metric-unit">${metric.unit}</span>` : ""
+          }</span>
+        </span>
         <span class="metric-label">${metric.label}</span>
       `;
       metricsGrid.appendChild(btn);
