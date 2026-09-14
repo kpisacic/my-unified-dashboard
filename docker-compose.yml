@@ -43,31 +43,33 @@ services:
     mem_limit: 128m
     restart: unless-stopped
 
-  docker-status:
-    build: ./docker-status
-    container_name: docker-status
-    environment:
-      MONITORED_CONTAINERS: "dhmz-weather,eko-karta-zagreb,stampar-pelud,wall-dashboard,docker-status"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    # Grants read access to the docker.sock without running as root - the
-    # non-root "status" user (see Dockerfile) becomes a supplementary
-    # member of whichever group owns the socket on the host. Override via
-    # a .env file (DOCKER_SOCK_GID=...) if you deploy this on a host where
-    # `stat -c '%g' /var/run/docker.sock` prints something other than 987.
-    group_add:
-      - "${DOCKER_SOCK_GID:-987}"
-    mem_limit: 64m
-    restart: unless-stopped
-
   dashboard:
     build: ./dashboard
     container_name: wall-dashboard
     ports:
       - "8090:80"
+    environment:
+      # Basic Auth for the /docker-api/ proxy (see nginx.conf) - a home-LAN
+      # speed bump, not real security (the password ships in the
+      # dashboard's own JS - see docker-entrypoint.sh). Override both in a
+      # .env file; the checked-in defaults are placeholders.
+      DOCKER_STATUS_USER: "dashboard"
+      DOCKER_STATUS_PASSWORD: "${DOCKER_STATUS_PASSWORD:-changeme}"
+      # docker-entrypoint.sh adds nginx's own user to a group with this
+      # GID before nginx starts - a plain docker-compose `group_add` does
+      # NOT work here, since nginx's worker processes (which is what
+      # actually handles the /docker-api/ proxy, not the root master) drop
+      # to the unprivileged "nginx" user via nginx's own `user` directive,
+      # which resets supplementary groups to whatever's in /etc/group
+      # (confirmed - group_add alone left workers with only their own
+      # group). Override via a .env file if
+      # `stat -c '%g' /var/run/docker.sock` prints something other than 987
+      # on your host.
+      DOCKER_SOCK_GID: "${DOCKER_SOCK_GID:-987}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       - dhmz-weather
       - eko-karta-zagreb
       - stampar-pelud
-      - docker-status
     restart: unless-stopped

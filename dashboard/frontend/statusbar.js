@@ -4,6 +4,11 @@
   const LOCALE = navigator.language && navigator.language.startsWith("hr") ? "hr" : "en";
   const STATUS_POLL_MS = 20 * 1000;
 
+  // Must match the exact-match whitelist in nginx.conf's /docker-api/
+  // location - nginx 404s anything not in that list regardless of what's
+  // requested here.
+  const MONITORED_CONTAINERS = ["dhmz-weather", "eko-karta-zagreb", "stampar-pelud", "wall-dashboard"];
+
   const els = {
     time: document.getElementById("statusbar-time"),
     day: document.getElementById("statusbar-day"),
@@ -20,6 +25,36 @@
     els.time.textContent = `${pad2(now.getHours())}:${pad2(now.getMinutes())}:${pad2(now.getSeconds())}`;
     els.day.textContent = now.toLocaleDateString(LOCALE, { weekday: "long" });
     els.date.textContent = `${pad2(now.getDate())}.${pad2(now.getMonth() + 1)}.${now.getFullYear()}`;
+  }
+
+  // Same state/health -> color mapping the old docker-status Python
+  // service used - moved client-side now that nginx proxies the Docker
+  // API's own inspect JSON straight through, unfiltered.
+  function colorFor(state, health) {
+    if (state === "running") {
+      if (health === "unhealthy") return "light-green";
+      if (health === "starting") return "yellow";
+      return "green"; // "healthy", or no healthcheck configured at all
+    }
+    if (state === "restarting") return "yellow";
+    if (state === "exited" || state === "dead" || state === "paused") return "red";
+    return "gray"; // "created", not found, or unreachable
+  }
+
+  async function fetchContainerStatus(name) {
+    try {
+      const res = await fetch(`/docker-api/containers/${encodeURIComponent(name)}/json`, {
+        cache: "no-store",
+        headers: window.DOCKER_STATUS_AUTH ? { Authorization: window.DOCKER_STATUS_AUTH } : {},
+      });
+      if (!res.ok) return { name, state: null, health: null, color: "gray" };
+      const info = await res.json();
+      const state = info.State && info.State.Status;
+      const health = info.State && info.State.Health && info.State.Health.Status;
+      return { name, state: state || null, health: health || null, color: colorFor(state, health) };
+    } catch (err) {
+      return { name, state: null, health: null, color: "gray" };
+    }
   }
 
   function renderContainers(containers) {
@@ -43,17 +78,11 @@
   }
 
   async function pollStatus() {
-    try {
-      const res = await fetch("/api/status", { cache: "no-store" });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      renderContainers(data.containers || []);
-    } catch (err) {
-      console.error("Failed to fetch container status:", err);
-      // Leave whatever was last rendered rather than wiping the row blank
-      // on a single missed poll - the service being briefly unreachable
-      // doesn't mean every container's own status is unknown.
-    }
+    // Independent per-container fetches now (vs. one aggregated call
+    // before), so one container's request failing doesn't leave the
+    // whole row stale - just that one dot goes gray.
+    const results = await Promise.all(MONITORED_CONTAINERS.map(fetchContainerStatus));
+    renderContainers(results);
   }
 
   tickClock();
