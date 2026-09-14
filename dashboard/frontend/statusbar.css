@@ -1,0 +1,75 @@
+/* Top status bar: live clock on the left, container-health dots on the
+   right. Reuses the shared dark palette from style.css. */
+
+.statusbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 14px;
+  background: var(--panel-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.statusbar-clock {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.statusbar-clock #statusbar-time {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.statusbar-clock #statusbar-day,
+.statusbar-clock #statusbar-date {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.statusbar-containers {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px 14px;
+}
+
+.statusbar-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: default;
+}
+
+.statusbar-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--dot-color, var(--muted));
+}
+
+.statusbar-dot.color-green { --dot-color: #22c55e; }
+.statusbar-dot.color-light-green { --dot-color: #86efac; }
+.statusbar-dot.color-yellow { --dot-color: #eab308; }
+.statusbar-dot.color-red { --dot-color: #ef4444; }
+.statusbar-dot.color-gray { --dot-color: #6b7280; }
+
+@media (max-width: 860px) {
+  .statusbar { padding: 5px 8px; gap: 8px; }
+  .statusbar-clock { gap: 6px; }
+  .statusbar-clock #statusbar-time { font-size: 15px; }
+  .statusbar-clock #statusbar-day,
+  .statusbar-clock #statusbar-date { font-size: 11px; }
+  .statusbar-containers { gap: 4px 8px; }
+  .statusbar-item { font-size: 10px; gap: 4px; }
+  .statusbar-dot { width: 8px; height: 8px; }
+}

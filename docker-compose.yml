@@ -43,6 +43,23 @@ services:
     mem_limit: 128m
     restart: unless-stopped
 
+  docker-status:
+    build: ./docker-status
+    container_name: docker-status
+    environment:
+      MONITORED_CONTAINERS: "dhmz-weather,eko-karta-zagreb,stampar-pelud,wall-dashboard,docker-status"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    # Grants read access to the docker.sock without running as root - the
+    # non-root "status" user (see Dockerfile) becomes a supplementary
+    # member of whichever group owns the socket on the host. Override via
+    # a .env file (DOCKER_SOCK_GID=...) if you deploy this on a host where
+    # `stat -c '%g' /var/run/docker.sock` prints something other than 987.
+    group_add:
+      - "${DOCKER_SOCK_GID:-987}"
+    mem_limit: 64m
+    restart: unless-stopped
+
   dashboard:
     build: ./dashboard
     container_name: wall-dashboard
@@ -52,4 +69,5 @@ services:
       - dhmz-weather
       - eko-karta-zagreb
       - stampar-pelud
+      - docker-status
     restart: unless-stopped

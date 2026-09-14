@@ -18,20 +18,22 @@ anything).
 ## Architecture
 
 ```
-┌──────────────────────────────────────────────┐
-│                nginx (wall-dashboard)         │  :8090 → tablet browser
-│  serves dashboard/frontend/ + reverse-proxies │
-│  /api/dhmz/*, /api/eko/*, /api/pollen/*       │
-└───────┬───────────────┬───────────────┬───────┘
-        │               │               │
- dhmz-weather   eko-karta-zagreb   stampar-pelud
-   :8000            :8080             :8080
- (FastAPI)      (stdlib http)      (stdlib http)
+┌────────────────────────────────────────────────────────────┐
+│                    nginx (wall-dashboard)                   │  :8090 → tablet browser
+│  serves dashboard/frontend/ + reverse-proxies                │
+│  /api/dhmz/*, /api/eko/*, /api/pollen/*, /api/status         │
+└───────┬───────────────┬───────────────┬───────────────┬──────┘
+        │               │               │               │
+ dhmz-weather   eko-karta-zagreb   stampar-pelud   docker-status
+   :8000            :8080             :8080            :8080
+ (stdlib http)   (stdlib http)    (stdlib http)     (stdlib http,
+                                                    reads /var/run/docker.sock)
 ```
 
-The three backends are **not** merged into one process/container — see
+The three data backends are **not** merged into one process/container — see
 "Why not merge the backends?" below. Only nginx's port (`8090`) is published to the
-host; the backends are reachable only from other containers on the compose network.
+host; every backend (including `docker-status`) is reachable only from other
+containers on the compose network.
 
 ## Running it
 
@@ -52,6 +54,16 @@ stampar-pelud-standalone/
 my-unified-dashboard/        <- this repo; run the command below from here
 ```
 
+The `docker-status` service (see below) needs read access to
+`/var/run/docker.sock`, via a supplementary group rather than running as root — find
+that group's numeric ID on the host and put it in a `.env` file next to
+`docker-compose.yml` (skip this if it happens to already be `987`, the default):
+
+```bash
+stat -c '%g' /var/run/docker.sock   # e.g. 987
+echo "DOCKER_SOCK_GID=987" > .env   # use whatever number the command above printed
+```
+
 ```bash
 docker compose up -d --build
 ```
@@ -69,6 +81,28 @@ The dropdowns in the Eko Karta and Stampar panels still let a viewer switch stat
 live from the tablet itself (remembered per-browser via `localStorage`) — the env vars
 above only set what's shown before that choice is made.
 
+## Status bar
+
+The top of the page shows a live clock (left) and a colored dot per monitored
+container (right) — no Portainer or other monitoring stack needed for this; the
+`docker-status` service reads exactly the same Docker Engine API Portainer itself
+uses, straight from `/var/run/docker.sock`. It never exposes that socket to the
+browser though — the frontend only ever gets back a container name and a color, never
+raw inspect data (env vars, mounts, etc.), so anything that can reach the dashboard on
+your LAN can't use it to poke at your Docker host.
+
+| Color | Meaning |
+|---|---|
+| 🟢 green | running, healthy (or no healthcheck defined at all) |
+| 🟢 light green | running, but its healthcheck is failing |
+| 🟡 yellow | starting / restarting |
+| 🔴 red | stopped (exited/dead/paused) |
+| ⚪ gray | not found, or the Docker socket couldn't be reached |
+
+Which containers show up is set by `MONITORED_CONTAINERS` (comma-separated container
+names) on the `docker-status` service in `docker-compose.yml` — defaults to all 5
+services in this stack, including `docker-status` itself.
+
 ## Why not merge the backends into one process?
 
 Measured with `docker stats` after a real fetch on each (Sept 2026):
@@ -79,7 +113,8 @@ Measured with `docker stats` after a real fetch on each (Sept 2026):
 | eko-karta-zagreb (stdlib only) | ~16-21 MiB | ~0.02-0.03% |
 | stampar-pelud (stdlib + bs4) | ~19-25 MiB | ~0.02% |
 | wall-dashboard (nginx) | ~8 MiB | ~0% |
-| **Total** | **~75-87 MiB** | |
+| docker-status (stdlib only) | ~13 MiB | ~0% |
+| **Total** | **~88-100 MiB** | |
 
 All three backends are now plain stdlib `http.server` apps (no web framework) — see
 [dhmz-weather-dashboard](../dhmz-weather-dashboard)'s history: it originally ran on
@@ -98,13 +133,18 @@ before; not worth it. The current ~75-87 MiB total leaves plenty of headroom.
 ## Project layout
 
 ```
-docker-compose.yml     # 4 services: the 3 backends (built from sibling repos) + dashboard
+docker-compose.yml     # 5 services: the 3 data backends (built from sibling repos)
+                        # + docker-status + dashboard
+docker-status/
+  Dockerfile            # python:3.12-alpine, zero pip dependencies
+  server.py             # reads /var/run/docker.sock, serves GET /api/status
 dashboard/
   Dockerfile            # nginx:alpine
   nginx.conf            # static file serving + /api/* reverse proxy
   frontend/
-    index.html          # 2-column grid: panel-dhmz | (panel-eko above panel-pollen)
-    style.css           # shared reset, dark theme vars, page-level grid
+    index.html          # .page (statusbar + dashboard-grid): panel-dhmz | (panel-eko above panel-pollen)
+    style.css            # shared reset, dark theme vars, page-level layout
+    statusbar.css / statusbar.js # clock + per-container status dots (see docker-status)
     dhmz.css / dhmz.js   # ported from dhmz-weather-dashboard/frontend, namespaced under .panel-dhmz
     eko.css  / eko.js    # ported from eko-karta-zagreb-standalone/.../static, namespaced under .panel-eko
     pollen.css / pollen.js # ported from stampar-pelud-standalone/.../static, namespaced under .panel-pollen

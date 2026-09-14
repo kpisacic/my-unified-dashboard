@@ -6,6 +6,7 @@
 <meta name="color-scheme" content="dark">
 <title>Wall Dashboard</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="statusbar.css">
 <link rel="stylesheet" href="dhmz.css">
 <link rel="stylesheet" href="eko.css">
 <link rel="stylesheet" href="pollen.css">
@@ -22,6 +23,16 @@
       <symbol id="dhmz-icon-arrow" viewBox="0 0 24 24"><path d="M12 3v18M12 3l-5 5M12 3l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     </defs>
   </svg>
+
+  <div class="page">
+  <header class="statusbar">
+    <div class="statusbar-clock">
+      <span id="statusbar-time">--:--:--</span>
+      <span id="statusbar-day"></span>
+      <span id="statusbar-date">--.--.----</span>
+    </div>
+    <div class="statusbar-containers" id="statusbar-containers"></div>
+  </header>
 
   <div class="dashboard-grid">
 
@@ -140,9 +151,11 @@
 
     </div>
   </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="statusbar.js"></script>
   <script src="dhmz.js"></script>
   <script src="eko.js"></script>
   <script src="pollen.js"></script>

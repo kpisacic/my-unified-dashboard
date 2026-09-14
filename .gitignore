@@ -2,3 +2,5 @@ data/
 __pycache__/
 *.pyc
 .claude/
+# Host-specific (e.g. DOCKER_SOCK_GID varies per machine) - see README.
+.env

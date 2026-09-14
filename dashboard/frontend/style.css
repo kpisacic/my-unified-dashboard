@@ -22,11 +22,18 @@ html, body {
   overflow: hidden;
 }
 
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1.25fr 1fr;
   gap: 14px;
-  height: 100vh;
+  flex: 1;
+  min-height: 0;
   padding: 14px;
 }
 
@@ -62,12 +69,15 @@ html, body {
 /* True single-column fallback for genuinely narrow screens (phones) -
    below this, even the compact 2-column spacing above has no room left. */
 @media (max-width: 480px) {
+  .page {
+    height: auto;
+    min-height: 100vh;
+  }
   .dashboard-grid {
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto;
-    height: auto;
-    min-height: 100vh;
-    overflow: auto;
+    flex: none;
+    overflow: visible;
   }
   html, body { overflow: auto; }
   .right-col {
