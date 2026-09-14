@@ -173,7 +173,10 @@
 }
 
 .panel-pollen .card-forecast {
-  font-size: 0.7rem;
+  /* ~2pt smaller than the 0.7rem this used to be - needs to be tiny to
+     avoid wrapping (which pushes the card taller than its neighbors) on
+     the tablet's narrower 2-column layout. */
+  font-size: 0.53rem;
   color: var(--muted);
   display: flex;
   flex-wrap: wrap;
